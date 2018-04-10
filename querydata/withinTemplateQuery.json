@@ -1,0 +1,143 @@
+{
+  "size" : 0,
+  "query" : {
+    "bool" : {
+      "filter" : [
+        {
+          "term" : {
+            "derived_is_available" : {
+              "value" : true,
+              "boost" : 1.0
+            }
+          }
+        },
+        {
+          "terms" : {
+            "derived_gender" : [
+              "Unisex"
+            ],
+            "boost" : 1.0
+          }
+        },
+        {
+          "terms" : {
+            "derived_age" : [
+              "Any"
+            ],
+            "boost" : 1.0
+          }
+        }
+      ],
+      "must_not" : [
+        {
+          "terms" : {
+            "productId" : [
+              "PRODUCT_ID"
+            ],
+            "boost" : 1.0
+          }
+        }
+      ],
+      "should" : [
+        {
+          "more_like_this" : {
+            "fields" : [
+              "title",
+              "description"
+            ],
+            "like" : [
+              "TITLE",
+              "DESCRIPTION"
+            ],
+            "max_query_terms" : 25,
+            "min_term_freq" : 1,
+            "min_doc_freq" : 1,
+            "max_doc_freq" : 2147483647,
+            "min_word_length" : 0,
+            "max_word_length" : 0,
+            "minimum_should_match" : "30%",
+            "boost_terms" : 0.0,
+            "include" : false,
+            "fail_on_unsupported_field" : true,
+            "boost" : 1.0
+          }
+        },
+        {
+          "term" : {
+            "brand" : {
+              "value" : "BRAND",
+              "boost" : 1.0
+            }
+          }
+        },
+        {
+          "more_like_this" : {
+            "fields" : [
+              "category",
+              "productType"
+            ],
+            "like" : [
+              "CATEGORY",
+              "PRODUCT_TYPE"
+            ],
+            "max_query_terms" : 25,
+            "min_term_freq" : 2,
+            "min_doc_freq" : 5,
+            "max_doc_freq" : 2147483647,
+            "min_word_length" : 0,
+            "max_word_length" : 0,
+            "minimum_should_match" : "30%",
+            "boost_terms" : 0.0,
+            "include" : false,
+            "fail_on_unsupported_field" : true,
+            "boost" : 1.0
+          }
+        }
+      ],
+      "disable_coord" : false,
+      "adjust_pure_negative" : true,
+      "boost" : 1.0
+    }
+  },
+  "aggregations" : {
+    "agg" : {
+      "terms" : {
+        "field" : "productId.keyword",
+        "size" : 15,
+        "shard_size" : -1,
+        "min_doc_count" : 1,
+        "shard_min_doc_count" : 0,
+        "show_term_doc_count_error" : false,
+        "order" : {
+          "top_hit" : "desc"
+        }
+      },
+      "aggregations" : {
+        "style_top_hit" : {
+          "top_hits" : {
+            "from" : 0,
+            "size" : 1,
+            "version" : false,
+            "explain" : false,
+            "_source" : {
+              "includes" : [
+                "styleId",
+                "productId"
+              ],
+              "excludes" : [ ]
+            }
+          }
+        },
+        "top_hit" : {
+          "max" : {
+            "script" : {
+              "inline" : "_score",
+              "lang" : "painless"
+            }
+          }
+        }
+      }
+    }
+  },
+  "ext" : { }
+}
